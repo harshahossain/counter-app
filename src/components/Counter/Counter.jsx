@@ -5,7 +5,8 @@ import MinusIcon from "../UI/Icons/MinusIcon.jsx";
 import PlusIcon from "../UI/Icons/PlusIcon.jsx";
 import CounterOutput from "./CounterOutput.jsx";
 import { log } from "../../log.js";
-
+import CounterHistory from "./CounterHistory.jsx";
+import { v4 as uuidv4 } from "uuid";
 function isPrime(number) {
   log("Calculating if is prime number", 2, "other");
 
@@ -32,22 +33,34 @@ const Counter = memo(function Counter({ initialCount }) {
     [initialCount]
   );
 
+  // useEffect(() => {
+  //   setCounterChanges([{ value: initialCount, id: uuidv4() }]);
+  // }, [initialCount]);
+
   // const [counter, setCounter] = useState(initialCount);
-  const [counterChanges, setCounterChanges] = useState([initialCount]);
+  const [counterChanges, setCounterChanges] = useState([
+    { value: initialCount, id: uuidv4() },
+  ]);
 
   const currentCounter = counterChanges.reduce(
-    (prevCounter, counterChange) => prevCounter + counterChange,
+    (prevCounter, counterChange) => prevCounter + counterChange.value,
     0
   );
 
   const handleDecrement = useCallback(function handleDecrement() {
     // setCounter((prevCounter) => prevCounter - 1);
-    setCounterChanges((prevCounterChanges) => [-1, ...prevCounterChanges]);
+    setCounterChanges((prevCounterChanges) => [
+      { value: -1, id: uuidv4() },
+      ...prevCounterChanges,
+    ]);
   }, []);
 
   const handleIncrement = useCallback(function handleIncrement() {
     // setCounter((prevCounter) => prevCounter + 1);
-    setCounterChanges((prevCounterChanges) => [1, ...prevCounterChanges]);
+    setCounterChanges((prevCounterChanges) => [
+      { value: 1, id: uuidv4() },
+      ...prevCounterChanges,
+    ]);
   }, []);
 
   return (
@@ -65,6 +78,7 @@ const Counter = memo(function Counter({ initialCount }) {
           Increment
         </IconButton>
       </p>
+      <CounterHistory history={counterChanges} />
     </section>
   );
 });
